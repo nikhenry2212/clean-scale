@@ -1,95 +1,108 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import React, { useState } from "react";
+import './page.module.css';
+// import style from './page.module.css'
+// import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import { useForm } from "react-hook-form";
+import { CardWeek } from "@/components/Card";
 
 export default function Home() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  // const [createWoman, setCreateWoman] = useState([]);
+  const [thursday, setThursday] = useState([]);
+  const [friday, setFriday] = useState([]);
+  const [saturday, setSaturday] = useState([]);
+  const [sunday, setSunday] = useState([]);
+
+  const [sorted, setSorted] = useState(false);
+  // let [arraysDivididos, SetArraysDivididos] = useState([]);
+  const [womanGroup, setWomanGroup] = useState([]);
+
+  function shuffleArray() {
+    setSorted(true);
+    for (let i = womanGroup.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [womanGroup[i], womanGroup[j]] = [womanGroup[j], womanGroup[i]];
+    }
+    let arraysDivididos = divideArray(womanGroup);
+    setThursday(arraysDivididos[0]);
+    setFriday(arraysDivididos[1]);
+    setSaturday(arraysDivididos[2]);
+    setSunday(arraysDivididos[3]);
+
+    console.log(arraysDivididos);
+  }
+
+  function divideArray(array) {
+    const chunkSize = Math.ceil(array.length / 4);
+    const dividedArrays = [];
+
+    for (let i = 0; i < 4; i++) {
+      const startIndex = i * chunkSize;
+      const endIndex = startIndex + chunkSize;
+      dividedArrays.push(array.slice(startIndex, endIndex));
+    }
+
+    return dividedArrays;
+  }
+
+  const onSubmit = (data) => {
+    console.log(data);
+    womanGroup.push(data);
+    // console.log(womanGroup);
+    // shuffleArray(womanGroup)
+    // divideArray(womanGroup)
+  };
+
+  // const arraysDivididos = divideArray(womanGroup);
+
+  // console.log(arraysDivididos);
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
+    <main className="main">
+      {/* <p>Cheguei</p> */}
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* register your input into the hook by invoking the "register" function */}
+
+        {/* include validation with required or other standard HTML validation rules */}
+        <input {...register("woman", { required: true })} />
+        {/* errors will return when field validation fails  */}
+        {errors.exampleRequired && <span>Campo vázio</span>}
+
+        <input type="submit" />
+      </form>
+
+      <CardWeek title={"Todas as pessoas"} array={womanGroup} />
+
+      <Button onClick={() => shuffleArray()} variant="contained">
+        Sorted
+      </Button>
+      {!sorted ? (
         <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+          <p>Sem dados</p>
         </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      ) : (
+        <div>
+          <CardWeek title={"Quinta-feira"} array={thursday} />
+          <CardWeek title={"Sexta-feira"} array={friday} />
+          <CardWeek title={"Sábado"} array={saturday} />
+          <CardWeek title={"Domingo"} array={sunday} />
+        </div>
+      )}
     </main>
-  )
+  );
 }
